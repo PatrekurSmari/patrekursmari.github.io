@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stjórnsýsla Vesturbyggðar – Ítarupplýsingar</title>
+  <style>
+    :root {
+      --orange: #E76F3A;
+      --orange-light: #FDF0E9;
+      --orange-dark: #C55D2B;
+      --navy: #1E2D40;
+      --gray-dark: #374151;
+      --gray-mid: #6B7280;
+      --gray-light: #F3F4F6;
+      --white: #FFFFFF;
+      --border: #E5E7EB;
+      --green: #15803D;
+      --blue: #1D4ED8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--gray-light);
+      color: var(--gray-dark);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      background: var(--navy);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      min-height: 60px;
+    }
+    #topbar h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    #topbar h1 span { color: var(--orange); }
+    #search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 380px;
+    }
+    #search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-mid);
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      outline: none;
+      transition: background 0.2s;
+    }
+    #search::placeholder { color: rgba(255,255,255,0.5); }
+    #search:focus { background: rgba(255,255,255,0.2); }
+    #back-btn {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    #back-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── HERO ── */
+    #hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #2C3E5A 100%);
+      color: #fff;
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    #hero h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    #hero p {
+      color: rgba(255,255,255,0.75);
+      max-width: 560px;
+      margin: 0 auto;
+      font-size: 0.95rem;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .tag {
+      background: rgba(231,111,58,0.25);
+      border: 1px solid rgba(231,111,58,0.4);
+      color: #FFD0B0;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    /* ── SEARCH RESULTS ── */
+    #search-results {
+      display: none;
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    .sr-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 14px;
+      color: var(--gray-mid);
+    }
+    .sr-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .sr-item:hover { border-color: var(--orange); box-shadow: 0 2px 8px rgba(231,111,58,0.15); }
+    .sr-item h4 { font-size: 0.95rem; color: var(--navy); margin-bottom: 4px; }
+    .sr-item p { font-size: 0.85rem; color: var(--gray-mid); }
+    mark { background: #FEF3C7; padding: 0 2px; border-radius: 2px; font-style: normal; }
+    #no-results { text-align: center; padding: 40px; color: var(--gray-mid); font-size: 0.95rem; }
+
+    /* ── OVERVIEW GRID ── */
+    #overview {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .section-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gray-mid);
+      margin-bottom: 16px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card:hover {
+      border-color: var(--orange);
+      box-shadow: 0 4px 16px rgba(231,111,58,0.15);
+      transform: translateY(-2px);
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--orange-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .card h3 { font-size: 0.95rem; font-weight: 700; color: var(--navy); }
+    .card p { font-size: 0.82rem; color: var(--gray-mid); line-height: 1.5; }
+    .card .chip {
+      display: inline-flex;
+      align-items: center;
+      background: var(--orange-light);
+      color: var(--orange-dark);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-top: 4px;
+      align-self: flex-start;
+    }
+
+    /* ── DETAIL VIEW ── */
+    #detail {
+      display: none;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+    .breadcrumb {
+      font-size: 0.82rem;
+      color: var(--gray-mid);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .breadcrumb a { color: var(--orange); text-decoration: none; cursor: pointer; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .detail-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .detail-header {
+      background: linear-gradient(135deg, var(--navy) 0%, #2C3E5A 100%);
+      padding: 32px 32px 28px;
+      color: #fff;
+    }
+    .detail-header .icon-big {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .detail-header h2 { font-size: 1.6rem; margin-bottom: 8px; }
+    .detail-header p { color: rgba(255,255,255,0.75); font-size: 0.92rem; max-width: 520px; }
+    .detail-body { padding: 32px; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .info-box {
+      background: var(--orange-light);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .info-box .label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--orange-dark); margin-bottom: 4px; }
+    .info-box .value { font-size: 0.95rem; font-weight: 600; color: var(--navy); }
+    h3.section-h { font-size: 1rem; font-weight: 700; color: var(--navy); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--orange-light); }
+    ul.points { padding-left: 0; list-style: none; }
+    ul.points li {
+      padding: 8px 0 8px 24px;
+      position: relative;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+    }
+    ul.points li:last-child { border-bottom: none; }
+    ul.points li::before { content: "→"; position: absolute; left: 0; color: var(--orange); font-weight: 700; }
+    .alert-box {
+      background: #FEF3C7;
+      border-left: 4px solid #F59E0B;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin: 20px 0;
+      font-size: 0.88rem;
+    }
+    .alert-box strong { display: block; margin-bottom: 4px; color: #92400E; }
+    .note-box {
+      background: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin: 20px 0;
+      font-size: 0.88rem;
+      color: #1E40AF;
+    }
+
+    /* Sub-tabs within detail */
+    .subtabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stab {
+      background: var(--gray-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.83rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray-mid);
+      transition: all 0.15s;
+    }
+    .stab.active, .stab:hover { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+    /* ── DOCS SECTION (compact footnote) ── */
+    #docs-section {
+      max-width: 1080px;
+      margin: 24px auto 48px;
+      padding: 20px 24px;
+      border-top: 2px solid var(--border);
+    }
+    .docs-footnote-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-mid);
+      margin-bottom: 16px;
+    }
+    .docs-footnote-wrap {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 32px;
+    }
+    @media (max-width: 800px) {
+      .docs-footnote-wrap { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .docs-footnote-wrap { grid-template-columns: 1fr; }
+    }
+    .docs-footnote-col { display: flex; flex-direction: column; gap: 4px; }
+    .docs-footnote-col-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+    .docs-fn-item { display: block; font-size: 0.8rem; line-height: 1.4; padding: 2px 0; }
+    .docs-fn-item a {
+      color: var(--gray-dark);
+      text-decoration: none;
+    }
+    .docs-fn-item a:hover { text-decoration: underline; color: var(--navy); }
+
+    /* ── CONTACT SECTION ── */
+    .contact-card {
+      background: var(--navy);
+      color: #fff;
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: flex-start;
+      margin: 0 0 40px;
+    }
+    .contact-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: #fff; }
+    .contact-item { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: rgba(255,255,255,0.8); margin-bottom: 8px; }
+    .contact-item a { color: var(--orange); text-decoration: none; }
+    .contact-item a:hover { text-decoration: underline; }
+
+    /* ── TABLE ── */
+    .fee-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin-top: 12px; }
+    .fee-table th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; font-size: 0.8rem; font-weight: 600; }
+    .fee-table th:last-child { text-align: right; }
+    .fee-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+    .fee-table td:last-child { text-align: right; font-weight: 600; color: var(--green); }
+    .fee-table tr:nth-child(even) td { background: var(--gray-light); }
+    .fee-table tr:hover td { background: var(--orange-light); }
+    .fee-note { font-size: 0.78rem; color: var(--gray-mid); margin-top: 8px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 20px 24px;
+      font-size: 0.78rem;
+    }
+    footer a { color: var(--orange); text-decoration: none; }
+
+    /* ── DETAIL SOURCE BLOCK ── */
+    .detail-source { margin-top: 24px; padding: 14px 16px; background: var(--gray-light); border-radius: 10px; }
+    .detail-source-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--navy); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .detail-source-links { display: flex; flex-direction: column; gap: 2px; }
+    .detail-src-item { display: block; font-size: 0.85rem; padding: 2px 0; }
+    .detail-src-item a,
+    .detail-source-links a { color: var(--gray-dark); text-decoration: none; font-size: 0.85rem; display: block; padding: 2px 0; }
+    .detail-src-item a:hover,
+    .detail-source-links a:hover { text-decoration: underline; color: var(--navy); }
+
+    /* ── HELPERS ── */
+    .hidden { display: none !important; }
+    @media (max-width: 600px) {
+      #hero h2 { font-size: 1.4rem; }
+      .detail-header { padding: 24px 20px 20px; }
+      .detail-body { padding: 20px; }
+      .info-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <h1>Stjórnsýsla <span>Vesturbyggðar</span></h1>
+  <div id="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" id="search" placeholder="Leita… t.d. bæjarráð, þagnarskylda, þóknun" autocomplete="off">
+  </div>
+  <button id="back-btn" onclick="showOverview()">
+    ← Til baka
+  </button>
+</div>
+
+<!-- HERO -->
+<div id="hero">
+  <h2>Ítarupplýsingar fyrir nýkjörna fulltrúa</h2>
+  <p>Hér eru upplýsingar um skipulag og stjórnsýslu Vesturbyggðar eftir sameiningu Tálknafjarðarhrepps og Vesturbyggðar. Allar upplýsingar eru sóttar beint úr samþykktum og erindisbréfum sveitarfélagsins.</p>
+</div>
+
+<!-- SEARCH RESULTS -->
+<div id="search-results">
+  <div class="sr-title" id="sr-label"></div>
+  <div id="sr-list"></div>
+  <div id="no-results" class="hidden">Ekkert fannst. Reyndu önnur leitarorð.</div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview">
+
+  <div class="section-label">Stjórnkerfi – smelltu á flokk til að sjá nánari upplýsingar</div>
+
+  <p class="card-group-label">Kjörnir fulltrúar</p>
+  <div class="card-grid">
+    <div class="card" onclick="showDetail('baejarstjorn')">
+      <div class="card-icon">🏛️</div>
+      <h3>Bæjarstjórn</h3>
+      <p>Æðsta vald í sveitarfélaginu. Kýs forseta, bæjarráð og fagnefndir.</p>
+      <span class="chip">7 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('baejarrað')">
+      <div class="card-icon">⚙️</div>
+      <h3>Bæjarráð</h3>
+      <p>Fer með daglega fjármála- og framkvæmdastjórn ásamt bæjarstjóra.</p>
+      <span class="chip">3 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('heimastjornir')">
+      <div class="card-icon">🗺️</div>
+      <h3>Heimastjórnir</h3>
+      <p>Fjórar heimastjórnir sjá um málefni einstakra byggðarhluta sveitarfélagsins.</p>
+      <span class="chip">4 heimastjórnir</span>
+    </div>
+    <div class="card" onclick="showDetail('sveitarstjornarlog')">
+      <div class="card-icon">📖</div>
+      <h3>Sveitarstjórnarlög</h3>
+      <p>Helstu ákvæði laganna um réttindi, skyldur, þagnarskyldu og vanhæfi kjörinna fulltrúa.</p>
+      <span class="chip">Nr. 138/2011</span>
+    </div>
+    <div class="card" onclick="showDetail('stjornsyslulog')">
+      <div class="card-icon">📜</div>
+      <h3>Stjórnsýslulög</h3>
+      <p>Ákvæði um vanhæfi, andmælarétt, rökstuðning og kæruréttindi við stjórnvaldsákvarðanir.</p>
+      <span class="chip">Nr. 37/1993</span>
+    </div>
+    <div class="card" onclick="showDetail('thoknum')">
+      <div class="card-icon">💰</div>
+      <h3>Þóknun kjörinna fulltrúa</h3>
+      <p>Yfirlit yfir mánaðarlegar þóknanir og fundarlaun kjörinna fulltrúa.</p>
+      <span class="chip">Reglur 2024</span>
+    </div>
+    <div class="card" onclick="showDetail('sidareglur')">
+      <div class="card-icon">⚖️</div>
+      <h3>Siðareglur og þagnarskylda</h3>
+      <p>Réttindi og skyldur kjörinna fulltrúa, vanhæfi og þagnarskylda.</p>
+      <span class="chip">Mikilvægt</span>
+    </div>
+  </div>
+
+  <p class="card-group-label">Ráðhús og stofnanir</p>
+  <div class="card-grid">
+    <div class="card" onclick="showDetail('baejarstjori')">
+      <div class="card-icon">👤</div>
+      <h3>Bæjarstjóri</h3>
+      <p>Æðsti starfsmaður sveitarfélagsins. Framkvæmir ákvarðanir og stýrir daglegum rekstri.</p>
+      <span class="chip">Starfsmaður</span>
+    </div>
+    <div class="card" onclick="showDetail('radhus')">
+      <div class="card-icon">📞</div>
+      <h3>Ráðhús Vesturbyggðar</h3>
+      <p>Heimilisfang, opnunartímar og starfsemi ráðhúss Vesturbyggðar.</p>
+      <span class="chip">Patreksfjörður</span>
+    </div>
+    <div class="card" onclick="showDetail('stofnanir')">
+      <div class="card-icon">🏢</div>
+      <h3>Stofnanir sveitarfélagsins</h3>
+      <p>Yfirlit yfir stofnanir og þjónustusvið sem starfa undir stjórn sveitarfélagsins.</p>
+      <span class="chip">Yfirlit</span>
+    </div>
+    <div class="card" onclick="showDetail('skipurit')">
+      <div class="card-icon">📊</div>
+      <h3>Skipurit</h3>
+      <p>Skipurit yfir skipulag og stjórnskipan Vesturbyggðar.</p>
+      <span class="chip">Yfirlit</span>
+    </div>
+  </div>
+
+  <p class="card-group-label">Fagnefndir og ráð</p>
+  <div class="card-grid">
+    <div class="card" onclick="showDetail('fraeslurad')">
+      <div class="card-icon">📚</div>
+      <h3>Fræðslu- og æskulýðsráð</h3>
+      <p>Skólar, leikskólar, tónlistarskóli, íþróttir og æskulýðsmál.</p>
+      <span class="chip">5 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('skipulagsrad')">
+      <div class="card-icon">🏗️</div>
+      <h3>Skipulags- og umhverfisráð</h3>
+      <p>Skipulagsmál, brunavarnir, umhverfiseftirlit og veitur.</p>
+      <span class="chip">5 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('hafnarad')">
+      <div class="card-icon">⚓</div>
+      <h3>Hafna- og atvinnumálaráð</h3>
+      <p>Rekstur fjögurra hafna og atvinnumál, sjávarútvegur og landbúnaður.</p>
+      <span class="chip">5 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('velferdarrad')">
+      <div class="card-icon">🤝</div>
+      <h3>Velferðarráð</h3>
+      <p>Félagsþjónusta, barnavernd, aldraðir og fatlaðir. Sameiginlegt með Tálknafjörð.</p>
+      <span class="chip">5 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('menningarrad')">
+      <div class="card-icon">🎨</div>
+      <h3>Menningar- og ferðamálaráð</h3>
+      <p>Bókasöfn, byggðasöfn, menningarhús og ferðamannaþjónusta.</p>
+      <span class="chip">5 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('oldrunarrad')">
+      <div class="card-icon">🌿</div>
+      <h3>Öldrunarráð</h3>
+      <p>Ráðgjafar um málefni íbúa 60 ára og eldri. Samráðsvettvangur.</p>
+      <span class="chip">7 fulltrúar</span>
+    </div>
+    <div class="card" onclick="showDetail('ungmennarad')">
+      <div class="card-icon">⭐</div>
+      <h3>Ungmennaráð</h3>
+      <p>Ráðgjafar um málefni ungs fólks á aldrinum 13–25 ára.</p>
+      <span class="chip">5 fulltrúar</span>
+    </div>
+  </div>
+
+  <!-- DOCS -->
+  <div id="docs-section">
+    <div class="docs-footnote-title">Frumheimildir – PDF skjöl</div>
+    <div class="docs-footnote-wrap">
+      <div class="docs-footnote-col">
+        <span class="docs-footnote-col-label">Stjórnkerfi og samþykktir</span>
+        <span class="docs-fn-item"><a href="samthykkt-um-strjorn-sameinads-sveitarfelagsins-talknafjarhrepps-og-vesturbyggdar.pdf" target="_blank">Samþykkt um stjórn Vesturbyggðar (nr. 410/2024)</a></span>
+        <span class="docs-fn-item"><a href="breyting á samþykkt um stjórn sameinaðs sveitarfélags.pdf" target="_blank">Breyting á samþykkt um stjórn (nr. 1315/2024)</a></span>
+        <span class="docs-fn-item"><a href="reglur-um-kjor-og-starfsadstodu-kjorinna-fulltrua.pdf" target="_blank">Reglur um kjör og starfsaðstöðu kjörinna fulltrúa</a></span>
+        <span class="docs-fn-item"><a href="sieareglur_kjorinna_fulltrua_i_vesturbygge.pdf" target="_blank">Siðareglur kjörinna fulltrúa í Vesturbyggð</a></span>
+        <span class="docs-fn-item"><a href="bajarrae_erindisbref-2020.pdf" target="_blank">Erindisbréf bæjarráðs</a></span>
+      </div>
+      <div class="docs-footnote-col">
+        <span class="docs-footnote-col-label">Lög</span>
+        <span class="docs-fn-item"><a href="https://www.althingi.is/lagas/nuna/2011138.html" target="_blank">Sveitarstjórnarlög nr. 138/2011</a></span>
+        <span class="docs-fn-item"><a href="https://www.althingi.is/lagas/nuna/1993037.html" target="_blank">Stjórnsýslulög nr. 37/1993</a></span>
+      </div>
+      <div class="docs-footnote-col">
+        <span class="docs-footnote-col-label">Heimastjórnir</span>
+        <span class="docs-fn-item"><a href="erindisbref-fyrir-heimastjorn-arnarfjardar-fyrrum-bildudalshrepps.pdf.pdf" target="_blank">Erindisbréf – Arnarfjörður</a></span>
+        <span class="docs-fn-item"><a href="erindisbref-fyrir-heimastjorn-talknafjardar-fyrrum-talknafjardarhrepps.pdf.pdf" target="_blank">Erindisbréf – Tálknafjörður</a></span>
+        <span class="docs-fn-item"><a href="erindisbref-fyrir-heimastjorn-fyrrum-bardastrandarhrepps-og-raudasandshrepps.pdf.pdf" target="_blank">Erindisbréf – Barðaströnd og Rauðasandur</a></span>
+        <span class="docs-fn-item"><a href="erindisbref-fyrir-heimastjorn-patreksfjardar-fyrrum-patrekshrepps.pdf.pdf" target="_blank">Erindisbréf – Patreksfjörður</a></span>
+        <span class="docs-fn-item"><a href="reglur-um-heimastjornarkosningar-i-sameinudu-sveitarfelagi-talknafjardarhrepps-og-vesturbyggdar.pdf" target="_blank">Reglur um heimastjórnarkosningar (nr. 370/2024)</a></span>
+      </div>
+      <div class="docs-footnote-col">
+        <span class="docs-footnote-col-label">Fagnefndir og ráð</span>
+        <span class="docs-fn-item"><a href="fraeslu-og-askulyesrae_erindisbref-2020.pdf" target="_blank">Erindisbréf Fræðslu- og æskulýðsráðs</a></span>
+        <span class="docs-fn-item"><a href="skipulags-og-umhverfisrae_erindisbref2020.pdf" target="_blank">Erindisbréf Skipulags- og umhverfisráðs</a></span>
+        <span class="docs-fn-item"><a href="hafna-og-atvinnumalarae_erindisbref-2020.pdf" target="_blank">Erindisbréf Hafna- og atvinnumálaráðs</a></span>
+        <span class="docs-fn-item"><a href="hafnarreglugere_fyrir_hafnir_vesturbyggear.pdf" target="_blank">Hafnarreglugerð (nr. 989/2005)</a></span>
+        <span class="docs-fn-item"><a href="velferearrae_erindisbref.pdf" target="_blank">Erindisbréf Velferðarráðs</a></span>
+        <span class="docs-fn-item"><a href="menningar-og-fereamalarae_erindisbref.pdf" target="_blank">Erindisbréf Menningar- og ferðamálaráðs</a></span>
+        <span class="docs-fn-item"><a href="Oldrunarrae_erindisbref.pdf" target="_blank">Erindisbréf Öldrunarráðs</a></span>
+        <span class="docs-fn-item"><a href="ungmennarae_erindisbref.pdf" target="_blank">Erindisbréf Ungmennaráðs</a></span>
+      </div>
+      <div class="docs-footnote-col">
+        <span class="docs-footnote-col-label">Persónuvernd</span>
+        <span class="docs-fn-item"><a href="innri-personuverndarstefna-vesturbyggdar.pdf" target="_blank">Innri persónuverndarstefna</a></span>
+        <span class="docs-fn-item"><a href="personuverndaryfirlysing-vesturbyggdar.pdf" target="_blank">Persónuverndaryfirlýsing</a></span>
+        <span class="docs-fn-item"><a href="upplysingaoryggisstefna-vesturbyggd.pdf" target="_blank">Upplýsingaöryggisstefna</a></span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /overview -->
+
+<!-- DETAIL VIEW -->
+<div id="detail"></div>
+
+<!-- FOOTER -->
+<footer>
+  Vesturbyggð · Aðalstræti 75, 450 Patreksfjörður · <a href="tel:+3544502300">+354 450 2300</a> · <a href="mailto:vesturbyggd@vesturbyggd.is">vesturbyggd@vesturbyggd.is</a>
+  <br>Upplýsingar á þessari síðu eru sóttar úr samþykktum og erindisbréfum Vesturbyggðar.
+</footer>
+
+<!-- ═══════════════════════════════════════
+     DATA & LOGIC
+     ═══════════════════════════════════════ -->
+<script>
+// ── SEARCHABLE DATA ──────────────────────────────────────────
+const DATA = [
+  { id: 'baejarstjorn', keywords: 'bæjarstjórn forseti fulltrúar kosning 7 sjö', title: 'Bæjarstjórn', summary: 'Æðsta vald sveitarfélagsins, skipuð 7 lýðræðislega kjörnum fulltrúum.' },
+  { id: 'baejarrað', keywords: 'bæjarráð framkvæmd fjármál 3 þrír fundir', title: 'Bæjarráð', summary: 'Fer með daglega fjármála- og framkvæmdastjórn ásamt bæjarstjóra.' },
+  { id: 'heimastjornir', keywords: 'heimastjórnir arnarfjörður patreksfjörður tálknafjörður barðaströnd rauðasandur íbúar', title: 'Heimastjórnir', summary: 'Fjórar heimastjórnir fara með málefni tiltekinna byggðarhluta.' },
+  { id: 'fraeslurad', keywords: 'fræðsluráð skóli grunnskóli leikskóli tónlistarskóli íþróttir æskulýður tómstundir', title: 'Fræðslu- og æskulýðsráð', summary: 'Fæst við skólamál, íþróttir og tómstundir barna og unglinga.' },
+  { id: 'skipulagsrad', keywords: 'skipulagsráð umhverfi brunavarnir almannavarnir hitaveita vatnsveitur fráveitur heilbrigðiseftirlit byggingarfulltrúi', title: 'Skipulags- og umhverfisráð', summary: 'Skipulagsmál, brunavarnir, umhverfiseftirlit og veitur.' },
+  { id: 'hafnarad', keywords: 'hafnarráð atvinnumál sjávarútvegur landbúnaður hafnir patrekshöfn bíldudalshöfn brjánslækjarhöfn örlygshöfn', title: 'Hafna- og atvinnumálaráð', summary: 'Rekstur hafna og atvinnumál sveitarfélagsins.' },
+  { id: 'velferdarrad', keywords: 'velferðarráð félagsþjónusta barnavernd aldraðir fatlaðir húsaleiga fjárhagsaðstoð', title: 'Velferðarráð', summary: 'Félagsþjónusta, barnavernd og þjónusta við aldraða og fatlaða.' },
+  { id: 'menningarrad', keywords: 'menningarráð ferðamál bókasafn byggðasafn menningarviðburðir tjaldsvæði ferðamenn', title: 'Menningar- og ferðamálaráð', summary: 'Bókasöfn, byggðasöfn, menning og ferðamál.' },
+  { id: 'oldrunarrad', keywords: 'öldrunarráð aldraðir 60 ára eldri pensjonerar félagi eldri borgara', title: 'Öldrunarráð', summary: 'Ráðgefandi um málefni íbúa 60 ára og eldri.' },
+  { id: 'ungmennarad', keywords: 'ungmennaráð ungt fólk 13 25 ára nemendaráð lýðræði forvarnir', title: 'Ungmennaráð', summary: 'Ráðgefandi um málefni ungs fólks á aldrinum 13–25 ára.' },
+  { id: 'sveitarstjornarlog', keywords: 'sveitarstjórnarlög lög 138 2011 mætingarskylda þagnarskylda vanhæfi réttindi skyldur fundir kjörnir fulltrúar', title: 'Sveitarstjórnarlög', summary: 'Helstu ákvæði sveitarstjórnarlaga nr. 138/2011 um réttindi og skyldur kjörinna fulltrúa, vanhæfi, þagnarskyldu og fundarskyldur.' },
+  { id: 'stjornsyslulog', keywords: 'stjórnsýslulög lög 37 1993 vanhæfi andmælaréttur rökstuðningur kæra stjórnsýsla réttarfar', title: 'Stjórnsýslulög', summary: 'Helstu ákvæði stjórnsýslulaga nr. 37/1993 um vanhæfi, andmælarétt, rökstuðning og kæruréttindi við töku stjórnvaldsákvarðana.' },
+  { id: 'thoknum', keywords: 'þóknun fundarlaun mánaðarlaun þingfarakaup launakjör greiðslur lífeyrir', title: 'Þóknun kjörinna fulltrúa', summary: 'Yfirlit yfir þóknanir, fundarlaun og lífeyrisréttindi.' },
+  { id: 'sidareglur', keywords: 'siðareglur þagnarskylda vanhæfi hagsmunaárekstrar skyldur réttindi áheyrnarfulltrúi', title: 'Siðareglur og þagnarskylda', summary: 'Hvernig kjörinn fulltrúi á að haga sér, þagnarskylda og vanhæfi.' },
+  { id: 'radhus', keywords: 'ráðhús heimilisfang patreksfjörður sími tölvupóstur starfsemi opnunartímar', title: 'Ráðhús Vesturbyggðar', summary: 'Heimilisfang, opnunartímar og starfsemi ráðhúss Vesturbyggðar.' },
+  { id: 'baejarstjori', keywords: 'bæjarstjóri framkvæmdastjóri starfsmaður skipun ráðning ábyrgð rekstrarleg', title: 'Bæjarstjóri', summary: 'Æðsti starfsmaður sveitarfélagsins. Framkvæmir ákvarðanir bæjarstjórnar og stýrir daglegum rekstri.' },
+  { id: 'stofnanir', keywords: 'stofnanir skólar leikskólar íþróttamiðstöð bókasafn hafnir félagsþjónusta slökkvilið', title: 'Stofnanir sveitarfélagsins', summary: 'Yfirlit yfir stofnanir og þjónustu sveitarfélagsins.' },
+  { id: 'skipurit', keywords: 'skipurit stjórnkerfi svið deildir bæjarstjóri fjölskyldusvið fjármálasvið hafnarstjóri umhverfissvið', title: 'Skipurit', summary: 'Skipurit sýnir skipulag sveitarfélagsins, yfirsvið og deildir undir bæjarstjóra.' },
+];
+
+// ── DETAIL CONTENT ────────────────────────────────────────────
+const DETAILS = {
+
+baejarstjorn: `
+<div class="detail-header">
+  <span class="icon-big">🏛️</span>
+  <h2>Bæjarstjórn</h2>
+  <p>Æðsta löggjafar- og ákvarðanavald sveitarfélagsins. Bæjarstjórn er kjörin af öllum íbúum sveitarfélagsins og ber endanlega ábyrgð á rekstri þess.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">7 bæjarfulltrúar</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+    <div class="info-box"><div class="label">Kjör</div><div class="value">Lýðræðisleg kosning af íbúum</div></div>
+    <div class="info-box"><div class="label">Tekur til starfa</div><div class="value">15 dögum eftir kjördag</div></div>
+  </div>
+
+  <h3 class="section-h">Hvað gerir bæjarstjórn?</h3>
+  <ul class="points">
+    <li>Fer með æðsta vald og yfirstjórn sveitarfélagsins</li>
+    <li>Kýs forseta og varaforsetann tvo á fyrsta fundi nýs kjörtímabils</li>
+    <li>Kýs bæjarráð (3 fulltrúa) til eins árs í senn</li>
+    <li>Kýs fulltrúa í fagnefndir og ráð til 4 ára</li>
+    <li>Ráðar bæjarstjóra og aðra í helstu stjórnunarstöður</li>
+    <li>Samþykkir fjárhagsáætlun og ársreikninga sveitarfélagsins</li>
+    <li>Setur samþykktir, gjaldskrár og reglur</li>
+    <li>Mótar stefnu og markmið sveitarfélagsins</li>
+    <li>Ber ábyrgð á því að lögbundnar skyldur séu ræktar</li>
+    <li>Ber fjárhagslega ábyrgð á stofnunum og fyrirtækjum sveitarfélagsins</li>
+  </ul>
+
+  <h3 class="section-h">Fyrsti fundur nýrrar bæjarstjórnar</h3>
+  <ul class="points">
+    <li>Sá fulltrúi sem lengst hefur setið í bæjarstjórn boðar til fyrsta fundar – hann stýrir þar til forseti er kjörinn</li>
+    <li>Boða skal til fyrsta fundar með a.m.k. 4 daga fyrirvara</li>
+    <li>Á fyrsta fundi eru kjörnir forseti, 1. varaforseti og 2. varaforseti</li>
+    <li>Á sama fundi eru einnig kjörnir fulltrúar í bæjarráð og fagnefndir</li>
+  </ul>
+
+
+  <h3 class="section-h">Fundir bæjarstjórnar</h3>
+  <ul class="points">
+    <li>Bæjarstjórn heldur reglulega fundi, <strong>að jafnaði einu sinni í mánuði</strong>, í ráðhúsi sveitarfélagsins</li>
+    <li>Á fyrsta fundi kjörtímabils ákveður bæjarstjórn fundardaga og -tíma fyrir allt kjörtímabilið</li>
+    <li>Aukafundir eru haldnir þegar forseti eða bæjarstjóri telja það nauðsynlegt, eða ef þriðjungur fulltrúa óskar þess</li>
+    <li>Fundarboð, dagskrá og fylgigögn skulu berast fulltrúum <strong>a.m.k. 2 sólarhringum</strong> fyrir fund</li>
+    <li>Fundir bæjarstjórnar eru opnir – íbúar geta sótt þá</li>
+    <li>Heimilt er að fella niður reglulegar fundir vegna sumarleyfis</li>
+  </ul>
+  <div class="note-box">
+    <strong>Heimild:</strong> Samþykkt um stjórn Vesturbyggðar, nr. 410/2024 (8. gr., III. kafli)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="samthykkt-um-strjorn-sameinads-sveitarfelagsins-talknafjarhrepps-og-vesturbyggdar.pdf" target="_blank">📑 Samþykkt um stjórn Vesturbyggðar (nr. 410/2024)</a></span>
+    <span class="detail-src-item"><a href="breyting á samþykkt um stjórn sameinaðs sveitarfélags.pdf" target="_blank">📑 Breyting á samþykkt um stjórn (nr. 1315/2024)</a></span>
+    </div>
+  </div>
+</div>`,
+
+'baejarrað': `
+<div class="detail-header">
+  <span class="icon-big">⚙️</span>
+  <h2>Bæjarráð</h2>
+  <p>Fer með daglega fjármála- og framkvæmdastjórn sveitarfélagsins ásamt bæjarstjóra. Heldur yfirumsjón með rekstri allra stofnana sveitarfélagsins.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">3 bæjarfulltrúar + 3 til vara</div></div>
+    <div class="info-box"><div class="label">Kjör</div><div class="value">Bæjarstjórn kýs – til 1 árs í senn (júní)</div></div>
+    <div class="info-box"><div class="label">Fundir</div><div class="value">2× í mánuði að jafnaði</div></div>
+    <div class="info-box"><div class="label">Fundarboð</div><div class="value">A.m.k. 1 sólarhring fyrirfram</div></div>
+  </div>
+
+  <h3 class="section-h">Hlutverk bæjarráðs</h3>
+  <ul class="points">
+    <li>Fer með daglega fjármála- og framkvæmdastjórn ásamt bæjarstjóra</li>
+    <li>Hefur yfirumsjón með rekstri allra stofnana sveitarfélagsins</li>
+    <li>Vinnur drög að fjárhagsáætlun ár hvert og fjögurra ára áætlun</li>
+    <li>Hefur eftirlit með því að rekstrarliðir séu í samræmi við samþykkta fjárhagsáætlun</li>
+    <li>Sér um gerð kjarasamninga og starfsmannamál (þar með taldar starfsmannaráðningar)</li>
+    <li>Getur tekið fullnaðarafgreiðslu í minni háttar málum sem ekki varða verulega fjárhag bæjarins</li>
+    <li>Gerir tillögur til bæjarstjórnar í stærri málum</li>
+  </ul>
+
+  <h3 class="section-h">Starfshættir</h3>
+  <ul class="points">
+    <li>Kemur saman fyrir luktum dyrum að jafnaði</li>
+    <li>Bæjarstjóri undirbýr fundi í samráði við formann bæjarráðs</li>
+    <li>Fundar telst ályktunarhæfur ef meirihluti (2 af 3) er mættur</li>
+    <li>Í atkvæðagreiðslu ræður afl atkvæða – ef jafnt fellur málið</li>
+    <li>Formaður og meðlimir snúa sér til bæjarstjóra með eftirfylgni ákvarðana</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf bæjarráðs (bajarrae_erindisbref-2020.pdf)
+  </div>
+</div>`,
+
+heimastjornir: `
+<div class="detail-header">
+  <span class="icon-big">🗺️</span>
+  <h2>Heimastjórnir</h2>
+  <p>Heimastjórnir fara með afmörkuð málefni og málaflokka í tilteknum hlutum sveitarfélagsins. Þær eru vettvangur samráðs og hafa einnig vald til fullnaðarafgreiðslu tiltekinna mála.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi heimastjórna</div><div class="value">4 heimastjórnir</div></div>
+    <div class="info-box"><div class="label">Fulltrúar í hverri</div><div class="value">3 fulltrúar + 3 til vara</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár – samhliða sveitarstjórnarkosningum</div></div>
+    <div class="info-box"><div class="label">Samþykkt</div><div class="value">19. júní 2024</div></div>
+  </div>
+
+  <h3 class="section-h">Fjórar heimastjórnir</h3>
+  <ul class="points">
+    <li><strong>Heimastjórn Arnarfjarðar</strong> (fyrrum Bíldudalshreppur)</li>
+    <li><strong>Heimastjórn Barðastrands og Rauðasands</strong> (fyrrum Barðastrandarhreppur og Rauðasandshreppur)</li>
+    <li><strong>Heimastjórn Patreksfjarðar</strong> (fyrrum Patrekshreppur)</li>
+    <li><strong>Heimastjórn Tálknafjarðar</strong> (fyrrum Tálknafjarðarhreppur) – bætt við 2024</li>
+  </ul>
+
+  <h3 class="section-h">Skipan heimastjórnar</h3>
+  <ul class="points">
+    <li>Bæjarstjórn kýs einn bæjarfulltrúa (aðalmann) og annan til vara – þeir þurfa að vera aðalfulltrúar í bæjarstjórn</li>
+    <li>Tveir fulltrúar og tveir til vara eru kjörnir beint af íbúum viðkomandi svæðis í sérstakri kosningu</li>
+    <li>Til að geta setið í heimastjórn þarf viðkomandi að hafa lögheimili á svæðinu</li>
+    <li>Bæjarstjórn kýs formann úr hópi aðalmanna</li>
+    <li>Fundir haldnir fyrir luktum dyrum nema fulltrúar óski eftir opnum fundi</li>
+    <li>Fundarboð með dagskrá og fylgigögnum a.m.k. 2 sólarhringum fyrir fund</li>
+  </ul>
+
+  <h3 class="section-h">Helstu verkefni heimastjórna</h3>
+  <ul class="points">
+    <li>Veitir umsögn um fjárhagsáætlun áður en hún er tekin fyrir í bæjarstjórn</li>
+    <li>Vinnur tillögur til bæjarstjórnar um þjónustustig í byggðum fjarri stærstu byggðakjörnum</li>
+    <li>Er vettvangur samráðs milli sveitarfélagsins og íbúa, félagasamtaka og atvinnulífs</li>
+    <li>Fer með verkefni náttúruverndarnefndar skv. lögum um náttúruvernd nr. 60/2013</li>
+    <li>Veitir bæjarráði umsögn um rekstrarfyrirkomulag félagsheimila og tjaldsvæða</li>
+    <li>Gerir tillögur um umferðarhraða og öryggisráðstafanir</li>
+    <li>Getur ályktað til bæjarstjórnar um hvert það málefni sem hún telur varða byggðahlutann</li>
+  </ul>
+
+  <h3 class="section-h">Valdheimildir – fullnaðarafgreiðsla án staðfestingar bæjarstjórnar</h3>
+  <p style="font-size:0.88rem;color:var(--gray-mid);margin-bottom:10px;">Heimastjórnir hafa vald til fullnaðarafgreiðslu eftirfarandi mála (6. gr. erindisbréfa, sbr. viðauka I við samþykkt nr. 410/2024):</p>
+
+  <p style="font-size:0.85rem;font-weight:700;color:var(--navy);margin:12px 0 6px;">Skipulagsmál (skipulagslög nr. 123/2010):</p>
+  <ul class="points">
+    <li>Framkvæmdaleyfi matsskyldra framkvæmda (14. gr. skipulagslaga)</li>
+    <li>Ákvörðun um tillögu að deiliskipulagi eða breytingu á deiliskipulagi</li>
+    <li>Samþykkt og kynning skipulagslýsingar</li>
+    <li>Ákvörðun um auglýsingu deiliskipulagstillögu</li>
+    <li>Afstaða til athugasemda við deiliskipulagstillögu og ákvörðun um breytingar</li>
+    <li>Fjalla um athugasemdir Skipulagsstofnunar um deiliskipulag</li>
+    <li>Óverulegar breytingar á deiliskipulagi (2. mgr. 43. gr. skipulagslaga)</li>
+    <li>Umsóknir um leyfi þar sem deiliskipulag liggur ekki fyrir en framkvæmd er í samræmi við aðalskipulag</li>
+    <li>Heiti á götum, vegum og torgum (47. gr. skipulagslaga)</li>
+  </ul>
+
+  <p style="font-size:0.85rem;font-weight:700;color:var(--navy);margin:12px 0 6px;">Umhverfismat (lög nr. 111/2021):</p>
+  <ul class="points">
+    <li>Umsögn um umhverfismat áætlana (III. kafli laganna)</li>
+    <li>Umsögn um umhverfismat framkvæmda (IV. kafli laganna)</li>
+  </ul>
+
+  <p style="font-size:0.85rem;font-weight:700;color:var(--navy);margin:12px 0 6px;">Veitingastaðir og gississtaðir:</p>
+  <ul class="points">
+    <li>Umsagnir um varanlegan rekstur veitingastaða, gississtaða og skemmtanahald (lög nr. 85/2007, m.a. 10. gr.)</li>
+  </ul>
+
+  <h3 class="section-h">Fjarfundir</h3>
+  <ul class="points">
+    <li>Heimilt er að nota fjarfundabúnað samkvæmt 14. gr. samþykktar</li>
+    <li>Skilyrði: fulltrúi sé staddur <strong>innan sveitarfélagsins</strong> eða í <strong>erindisgjörðum innanlands á vegum sveitarfélagsins</strong></li>
+    <li>Fulltrúi þarf að vera í fullnægjandi aðstöðu til að sækja fundinn</li>
+  </ul>
+
+  <h3 class="section-h">Þagnarskylda (7. gr.)</h3>
+  <ul class="points">
+    <li>Fulltrúar skulu gæta þagnarskyldu um það sem þeir fá vitneskju um í starfi og leynt á að fara vegna einka- og/eða almannahagsmuna</li>
+    <li>Þagnarskylda helst áfram <strong>eftir að fulltrúi lætur af störfum</strong></li>
+    <li>Fulltrúi skal <strong>víkja af fundi og kalla til varamann</strong> ef hann tengist einstaklingum eða málum sem fjallað er um þannig að spillt geti óhlutdrægni hans</li>
+    <li>Þagnarskyldan gildir einnig um aðra fundarmenn á fundum heimastjórna</li>
+  </ul>
+
+  <div class="alert-box">
+    <strong>Athugið:</strong> Meirihluti fulltrúa í heimastjórn er kjörinn beint af íbúum svæðisins – ekki af bæjarstjórn. Þetta þýðir að bæjarstjórn ræður ekki meirihluta í heimastjórnum.
+  </div>
+
+  <div class="note-box">
+    <strong>Heimildir:</strong> Erindisbréf heimastjórna Arnarfjarðar, Tálknafjarðar, Barðastrands og Rauðasands og Patreksfjarðar (samþykkt 19.06.2024); Reglur um heimastjórnarkosningar (nr. 370/2024)
+  </div>
+</div>`,
+fraeslurad: `
+<div class="detail-header">
+  <span class="icon-big">📚</span>
+  <h2>Fræðslu- og æskulýðsráð</h2>
+  <p>Hefur faglega umsjón með skólum, leikskólum og íþrótta- og tómstundastofnunum Vesturbyggðar.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">5 + 5 til vara</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+    <div class="info-box"><div class="label">Starfsmaður</div><div class="value">Starfamaður fjölskyldusviðs</div></div>
+    <div class="info-box"><div class="label">Málaflokkar</div><div class="value">04 Fræðslumál · 06 Æskulýðsmál</div></div>
+  </div>
+
+  <h3 class="section-h">Stofnanir á verksviði ráðsins</h3>
+  <ul class="points">
+    <li>Grunnskólar</li>
+    <li>Leikskólar</li>
+    <li>Tónlistarskóli</li>
+    <li>Framhaldsskóli</li>
+    <li>Íþróttamiðstöðvar (íþróttahús og sundlaugar)</li>
+    <li>Leikvellir og félagsmiðstöðvar</li>
+    <li>Íþróttavellir</li>
+  </ul>
+
+  <h3 class="section-h">Hlutverk ráðsins</h3>
+  <ul class="points">
+    <li>Er bæjarstjórn til ráðgjafar í fræðslumálum, íþrótta-, æskulýðs-, tómstunda- og forvarnarmálum</li>
+    <li>Sér um að öll skólaskyld börn í Vesturbyggð njóti lögboðinnar fræðslu</li>
+    <li>Hefur eftirlit með því að stofnanir starfi innan ramma laga og samþykktrar fjárhagsáætlunar</li>
+    <li>Er umsagnaraðili um ráðningar skólastjóra og forstöðumanna stofnana</li>
+    <li>Gerir tillögur til bæjarstjórnar um fjárhagsáætlun vegna stofnananna</li>
+  </ul>
+
+  <h3 class="section-h">Sérstakir gestir á fundum</h3>
+  <ul class="points">
+    <li>Skólastjórar leik- og grunnskóla eiga rétt á fundarsetu (með málfrelsi og tillögurétti)</li>
+    <li>Fulltrúar grunnskólakennara eiga rétt á fundarsetu</li>
+    <li>Fulltrúi foreldrafélaga skólanna á rétt á fundarsetu</li>
+    <li>Bæjarstjóri á rétt á fundarsetu</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf Fræðslu- og æskulýðsráðs (fraeslu-og-askulyesrae_erindisbref-2020.pdf)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="fraeslu-og-askulyesrae_erindisbref-2020.pdf" target="_blank">📑 Erindisbréf Fræðslu- og æskulýðsráðs</a></span>
+    </div>
+  </div>
+</div>`,
+
+skipulagsrad: `
+<div class="detail-header">
+  <span class="icon-big">🏗️</span>
+  <h2>Skipulags- og umhverfisráð</h2>
+  <p>Fæst við bruna- og almannavarnir, skipulagsmál, umhverfiseftirlit, veitur og gatnagerð.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">5 + 5 til vara</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+    <div class="info-box"><div class="label">Starfsmaður</div><div class="value">Byggingarfulltrúi/skipulagsfulltrúi</div></div>
+  </div>
+
+  <h3 class="section-h">Málaflokkar sem heyra undir ráðið</h3>
+  <ul class="points">
+    <li>Brunavarnir og almannavarnir</li>
+    <li>Heilbrigðiseftirlit (þ.m.t. hunda- og kattaeftirlit)</li>
+    <li>Skipulags- og byggingarmál</li>
+    <li>Umferðar- og samgöngumál</li>
+    <li>Umhverfismál (sorpeyðing, sorphreinsun, almenningsgarðar)</li>
+    <li>Hitaveita Barðaströnd</li>
+    <li>Eignasjóður</li>
+    <li>Þjónustumiðstöðvar</li>
+    <li>Vatnsveitur og fráveitur</li>
+  </ul>
+
+  <h3 class="section-h">Hlutverk ráðsins</h3>
+  <ul class="points">
+    <li>Er bæjarstjórn til ráðgjafar í skipulags- og umhverfismálum</li>
+    <li>Hefur eftirlit með framkvæmd skipulagsáætlana</li>
+    <li>Er umsagnaraðili um ráðningar forstöðumanna stofnana</li>
+    <li>Gerir tillögur um fjárhagsáætlun vegna stofnana á verksviði ráðsins</li>
+    <li>Hefur faglega umsjón með stofnunum og eftirlit með rekstri þeirra</li>
+  </ul>
+
+  <h3 class="section-h">Sérstakir gestir á fundum</h3>
+  <ul class="points">
+    <li>Byggingarfulltrúi/skipulagsfulltrúi situr fundi með málfrelsi og tillögurétti</li>
+    <li>Slökkviliðsstjóri situr fundi þegar fjallað er um brunamál og almannavarnir</li>
+    <li>Bæjarstjóri á rétt á fundarsetu</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf Skipulags- og umhverfisráðs (skipulags-og-umhverfisrae_erindisbref2020.pdf)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="skipulags-og-umhverfisrae_erindisbref2020.pdf" target="_blank">📑 Erindisbréf Skipulags- og umhverfisráðs</a></span>
+    </div>
+  </div>
+</div>`,
+
+hafnarad: `
+<div class="detail-header">
+  <span class="icon-big">⚓</span>
+  <h2>Hafna- og atvinnumálaráð</h2>
+  <p>Fer með rekstur hafna Vesturbyggðar og atvinnumál sveitarfélagsins, þar á meðal sjávarútveg og landbúnað.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">5 + 5 til vara</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+    <div class="info-box"><div class="label">Starfsmaður</div><div class="value">Hafnarstjóri</div></div>
+  </div>
+
+  <h3 class="section-h">Hafnir Vesturbyggðar</h3>
+  <ul class="points">
+    <li><strong>Patrekshöfn</strong> – skiptist í ytri og innri höfn</li>
+    <li><strong>Bíldudalshöfn</strong></li>
+    <li><strong>Brjánslækjarhöfn</strong> (ferjuhöfn)</li>
+    <li><strong>Örlygshöfn</strong></li>
+  </ul>
+  <p style="font-size:0.85rem;color:var(--gray-mid);margin-top:8px;">Vesturbyggð er eigandi allra hafnanna. Bæjarstjórn fer með yfirstjórn hafnamála.</p>
+
+  <h3 class="section-h">Hlutverk ráðsins</h3>
+  <ul class="points">
+    <li>Sinnir verkefnum hafnarstjórnar skv. hafnarreglugerð og hafnalögum</li>
+    <li>Fer með fullnaðarafgreiðslu mála er varða rekstur hafnanna (ráðstöfun á aðstöðu, leigu á húsnæði o.fl.)</li>
+    <li>Veitir leyfi til starfsemi á hafnarsvæðinu og getur bannað eða takmarkað afnot þess</li>
+    <li>Hefur umsjón með fjármálum, rekstri, viðhaldi og nýbyggingum hafnanna</li>
+    <li>Er bæjarstjórn til ráðgjafar um atvinnumál, sjávarútveg og landbúnað</li>
+    <li>Fer með málefni tengd minkum og refum</li>
+  </ul>
+
+  <div class="alert-box">
+    <strong>Mikilvægt um fjármál hafna:</strong> Leita þarf staðfestingar bæjarstjórnar á fjárhagsáætlun hafnarsjóðs og á lántökum hafnarsjóðs sem ganga yfir yfirstandandi fjárhagsár.
+  </div>
+
+  <div class="note-box">
+    <strong>Heimildir:</strong> Erindisbréf Hafna- og atvinnumálaráðs og Hafnarreglugerð nr. 989/2005
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="hafna-og-atvinnumalarae_erindisbref-2020.pdf" target="_blank">📑 Erindisbréf Hafna- og atvinnumálaráðs</a></span>
+    <span class="detail-src-item"><a href="hafnarreglugere_fyrir_hafnir_vesturbyggear.pdf" target="_blank">📑 Hafnarreglugerð Vesturbyggðar (nr. 989/2005)</a></span>
+    </div>
+  </div>
+</div>`,
+
+velferdarrad: `
+<div class="detail-header">
+  <span class="icon-big">🤝</span>
+  <h2>Velferðarráð Vesturbyggðar og Tálknafjarðarhrepps</h2>
+  <p>Sameiginlegt velferðarráð beggja sveitarfélaga sem fer með félagsþjónustu, barnavernd og þjónustu við aldraða og fatlaða.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">5 fulltrúar</div></div>
+    <div class="info-box"><div class="label">Vesturbyggð</div><div class="value">3 fulltrúar</div></div>
+    <div class="info-box"><div class="label">Tálknafjarðarhreppur</div><div class="value">2 fulltrúar</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+  </div>
+
+  <h3 class="section-h">Málefni sem heyra undir ráðið</h3>
+  <ul class="points">
+    <li>Félagsleg ráðgjöf og fjárhagsaðstoð</li>
+    <li>Félagsleg heimaþjónusta</li>
+    <li>Barnavernd (fer einnig með verkefni barnaverndarnefndar)</li>
+    <li>Málefni barna og ungmenna</li>
+    <li>Málefni aldraðra</li>
+    <li>Málefni fatlaðs fólks</li>
+    <li>Jafnréttismál</li>
+    <li>Áfengis- og vímuefnavarnir</li>
+    <li>Húsaleigubætur</li>
+  </ul>
+
+  <h3 class="section-h">Starfsmaður og tengsl</h3>
+  <ul class="points">
+    <li>Sviðsstjóri fjölskyldusviðs og/eða starfsmaður fjölskyldusviðs starfar með ráðinu</li>
+    <li>Ráðið starfar með fjölskyldusviði sveitarfélagsins</li>
+    <li>Formaður ráðsins sér um boðun funda í samráði við sviðsstjóra fjölskyldusviðs eða bæjarstjóra</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf Velferðarráðs Vesturbyggðar og Tálknafjarðarhrepps (velferearrae_erindisbref.pdf)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="velferearrae_erindisbref.pdf" target="_blank">📑 Erindisbréf Velferðarráðs</a></span>
+    </div>
+  </div>
+</div>`,
+
+menningarrad: `
+<div class="detail-header">
+  <span class="icon-big">🎨</span>
+  <h2>Menningar- og ferðamálaráð</h2>
+  <p>Hefur faglega umsjón með menningarlegar stofnanir og ferðamannaþjónustu Vesturbyggðar.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">5 + 5 til vara</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+    <div class="info-box"><div class="label">Starfsmaður</div><div class="value">Menningar- og ferðamálafulltrúi</div></div>
+    <div class="info-box"><div class="label">Málaflokkar</div><div class="value">05 Menningarmál · 17 Félagsheimili</div></div>
+  </div>
+
+  <h3 class="section-h">Stofnanir á verksviði ráðsins</h3>
+  <ul class="points">
+    <li>Bókasöfn</li>
+    <li>Byggðasöfn og önnur söfn</li>
+    <li>Menningarhús</li>
+    <li>Hátíðarhöld</li>
+    <li>Ferðamál og ferðamannaþjónusta</li>
+    <li>Tjaldsvæði</li>
+    <li>Félagsheimili (skiptir með sér verkum með heimastjórnum)</li>
+  </ul>
+
+  <h3 class="section-h">Hlutverk ráðsins</h3>
+  <ul class="points">
+    <li>Er bæjarstjórn til ráðgjafar í ferða- og menningarmálum, þar með talið lista- og safnamálum</li>
+    <li>Skipar fulltrúa í rekstrarnefndir félagsheimila</li>
+    <li>Er umsagnaraðili um ráðningar forstöðumanna stofnana á verksviði ráðsins</li>
+    <li>Gerir tillögur til bæjarstjórnar um fjárhagsáætlun</li>
+    <li>Hefur eftirlit með rekstri stofnana á verksviði sínu</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf Menningar- og ferðamálaráðs (menningar-og-fereamalarae_erindisbref.pdf)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="menningar-og-fereamalarae_erindisbref.pdf" target="_blank">📑 Erindisbréf Menningar- og ferðamálaráðs</a></span>
+    </div>
+  </div>
+</div>`,
+
+oldrunarrad: `
+<div class="detail-header">
+  <span class="icon-big">🌿</span>
+  <h2>Öldrunarráð</h2>
+  <p>Samráðsvettvangur um þjónustu við aldraða. Ráðgefandi um málefni íbúa 60 ára og eldri í sveitarfélaginu.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Kjörnir fulltrúar</div><div class="value">3 (kjörið af bæjarstjórn)</div></div>
+    <div class="info-box"><div class="label">Frá félagi eldri borgara</div><div class="value">3 fulltrúar</div></div>
+    <div class="info-box"><div class="label">Frá Heilbrigðisstofnun Vestfjarða</div><div class="value">1 fulltrúi</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil</div><div class="value">4 ár</div></div>
+  </div>
+
+  <h3 class="section-h">Hlutverk öldrunarráðs</h3>
+  <ul class="points">
+    <li>Er bæjarstjórn til ráðgjafar í málefnum aldraðra í sveitarfélaginu</li>
+    <li>Kemur skoðunum og tillögum íbúa 60 ára og eldri til viðeigandi aðila í stjórnkerfi sveitarfélagsins</li>
+    <li>Gætir hagsmuna íbúa 60 ára og eldri</li>
+    <li>Eflir tengsl hagsmunasamtaka og bæjarstjórnar</li>
+    <li>Gerir tillögur til Velferðarráðs um stefnumörkun í málefnum aldraðra</li>
+    <li>Getur gert tillögur til sveitarstjórnar, þar á meðal um skipulag öldrunarþjónustu</li>
+  </ul>
+
+  <h3 class="section-h">Starfshættir</h3>
+  <ul class="points">
+    <li>Kemur saman fyrir luktum dyrum – getur opnað fundi ef ósk kemur fram</li>
+    <li>Öldrunarráð kýs sér formann og varaformann á fyrsta fundi sínum</li>
+    <li>Formaður sér um boðun funda í samráði við bæjarstjóra</li>
+    <li>Fundargerðir eru birtar á heimasíðu sveitarfélagsins</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf Öldrunarráðs (Oldrunarrae_erindisbref.pdf)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="Oldrunarrae_erindisbref.pdf" target="_blank">📑 Erindisbréf Öldrunarráðs</a></span>
+    </div>
+  </div>
+</div>`,
+
+ungmennarad: `
+<div class="detail-header">
+  <span class="icon-big">⭐</span>
+  <h2>Ungmennaráð</h2>
+  <p>Umræðu- og samstarfsvettvangur ungmenna. Ráðgefandi um málefni ungs fólks í sveitarfélaginu.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Fjöldi fulltrúa</div><div class="value">5 fulltrúar + 5 til vara</div></div>
+    <div class="info-box"><div class="label">Aldur fulltrúa</div><div class="value">13–25 ára</div></div>
+    <div class="info-box"><div class="label">Kjörtímabil fulltrúa</div><div class="value">Hámark 2 ár</div></div>
+    <div class="info-box"><div class="label">Fundir</div><div class="value">Allt að 4 á ári</div></div>
+  </div>
+
+  <h3 class="section-h">Skipan ráðsins</h3>
+  <ul class="points">
+    <li>3 fulltrúar valdir af lýðræðislega kjörnum nemendaráðum skólanna</li>
+    <li>2 fulltrúar tilnefndir af fræðslu- og æskulýðsráði</li>
+    <li>Við val skal leitast við að kynjahluföll séu sem jöfnust</li>
+    <li>Tveir fulltrúar skulu vera á aldrinum 13–16 ára (frá grunnskólum)</li>
+    <li>Þrír fulltrúar á aldrinum 16–25 ára (þar af a.m.k. einn frá FSN)</li>
+  </ul>
+
+  <h3 class="section-h">Hlutverk ungmennaráðs</h3>
+  <ul class="points">
+    <li>Er bæjarstjórn og fræðslu- og æskulýðsráði til ráðgjafar varðandi aðstöðu og afþreying ungs fólks</li>
+    <li>Kemur tillögum og skoðunum ungs fólks til viðeigandi aðila í stjórnkerfi sveitarfélagsins</li>
+    <li>Veitir ungu fólki fræðslu og þjálfun í lýðræðislegum vinnubrögðum</li>
+    <li>Hvetur ungt fólk í sveitarfélaginu til lýðræðislegrar þáttöku</li>
+    <li>Fylgist með því að stofnanir sveitarfélagsins vinni með hagsmuni ungs fólks að leiðarljósi</li>
+    <li>Gerir tillögur um þátttöku ungs fólks í viðburðum á vegum sveitarfélagsins</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Erindisbréf Ungmennaráðs (ungmennarae_erindisbref.pdf)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="ungmennarae_erindisbref.pdf" target="_blank">📑 Erindisbréf Ungmennaráðs</a></span>
+    </div>
+  </div>
+</div>`,
+
+thoknum: `
+<div class="detail-header">
+  <span class="icon-big">💰</span>
+  <h2>Þóknun og starfskjör kjörinna fulltrúa</h2>
+  <p>Þóknanir kjörinna fulltrúa eru hlutfall af þingfararkaupi Alþingismanna á hverjum tíma. Taflan hér að neðan byggir á þingfararkaupi frá 1. júlí 2025: kr. 1.611.288.</p>
+</div>
+<div class="detail-body">
+  <table class="fee-table">
+    <thead>
+      <tr><th>Staða / tegund greiðslu</th><th>Tíðni</th><th>%</th><th>Upphæð</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Forseti bæjarstjórnar – mánaðarlaun</td><td>Á mánuði</td><td>15%</td><td>kr. 241.693</td></tr>
+      <tr><td>Forseti bæjarstjórnar – fundarlaun</td><td>Á fund</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Bæjarfulltrúi – mánaðarlaun</td><td>Á mánuði</td><td>7%</td><td>kr. 112.790</td></tr>
+      <tr><td>Bæjarstjórn – fundarlaun (fulltrúi)</td><td>Á fund</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Formaður bæjarráðs – mánaðarlaun</td><td>Á mánuði</td><td>18%</td><td>kr. 290.032</td></tr>
+      <tr><td>Formaður bæjarráðs – fundarlaun</td><td>Á fund</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Bæjarráðsfulltrúi – mánaðarlaun</td><td>Á mánuði</td><td>10%</td><td>kr. 161.129</td></tr>
+      <tr><td>Bæjarráð – fundarlaun (fulltrúi)</td><td>Á fund</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Nefndarfundur – meðlimur</td><td>Á fund</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Nefndarfundur – formaður</td><td>Á fund</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Nefndarlaun – formaður (mánaðarlaun)</td><td>Á mánuði</td><td>2%</td><td>kr. 32.226</td></tr>
+      <tr><td>Vinnufundur – formaður nefndar</td><td>Á fund</td><td>3%</td><td>kr. 48.339</td></tr>
+      <tr><td>Öldrunarráð / Ungmennaráð – formaður</td><td>Á fund</td><td>1,875%</td><td>kr. 30.212</td></tr>
+      <tr><td>Öldrunarráð / Ungmennaráð – meðlimur</td><td>Á fund</td><td>1,25%</td><td>kr. 20.141</td></tr>
+      <tr><td>Fundarseta heilan dag utan sveitarfélags</td><td>Á dag</td><td>2,5%</td><td>kr. 40.282</td></tr>
+    </tbody>
+  </table>
+  <p class="fee-note">* Taflan tekur breytingum þegar þingfarakaup breytist. Miðað við þingfarakaup kr. 1.611.288 frá 01.07.2025.</p>
+
+  <h3 class="section-h">Aðrar mikilvægar reglur</h3>
+  <ul class="points">
+    <li>Bæjarfulltrúar fá greidda þóknun 12 mánuði á ári – greidd út einu sinni í mánuði</li>
+    <li>Varafulltrúar fá þóknun sem aðalfulltrúar fyrir hvern heilan setinn fund</li>
+    <li>Varafulltrúar sem taka sæti í bæjarstjórn eða bæjarráði í einstökum málum fá 25% af fundarlaunum</li>
+    <li>Fastar mánaðarlegar þóknanir falla niður ef kjörinn fulltrúi sækir ekki fundi <strong>samfleytt</strong> þrisvar – þá fær hann fundargreiðslur þar til næstu áramót</li>
+    <li>Orlof telst innifalið í framangreindum greiðslum</li>
+    <li>Iðgjald í lífeyrissjóð: 4% af kjörnum fulltrúa gegn 11,5% mótframlagi sveitarfélagsins</li>
+    <li>Bæjarfulltrúar skulu vera slysatryggðir í störfum sínum</li>
+    <li>Áheynarfulltrúar framboðsaðila fá sömu kjör og aðalfulltrúar</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Reglur um kjör og starfsaðstöðu kjörinna fulltrúa hjá Vesturbyggð
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="reglur-um-kjor-og-starfsadstodu-kjorinna-fulltrua.pdf" target="_blank">📑 Reglur um kjör og starfsaðstöðu kjörinna fulltrúa</a></span>
+    </div>
+  </div>
+</div>`,
+
+sidareglur: `
+<div class="detail-header">
+  <span class="icon-big">⚖️</span>
+  <h2>Siðareglur og þagnarskylda</h2>
+  <p>Kjörnir fulltrúar eru bundnir af lögum, samþykktum og siðareglum Vesturbyggðar. Hér eru helstu atriðin sem nýkjörinn fulltrúi þarf að þekkja.</p>
+</div>
+<div class="detail-body">
+
+  <h3 class="section-h">Þagnarskylda</h3>
+  <ul class="points">
+    <li>Fundarmenn eru bundnir þagnarskyldu vegna mála sem þeir fá vitneskju um í starfi sínu og ætla má að leynt eigi að fara – hvort sem þau varða einka- eða almannahagsmuni</li>
+    <li><strong>Þagnarskyldan helst þótt kjörinn fulltrúi láti af störfum</strong></li>
+    <li>Þetta á við um alla nefndir og ráð</li>
+  </ul>
+
+  <h3 class="section-h">Vanhæfi – hvenær á að víkja af fundi?</h3>
+  <ul class="points">
+    <li>Fulltrúi skal víkja af fundi við umræður og afgreiðslu mála sem varðar hann sjálfan</li>
+    <li>Einnig þarf að víkja vegna mála sem varðar skyldmenni eða nánustu venslamenn – ef ætla má að það móti viljaafstöðu hans</li>
+    <li>Honum er þó heimilt að gera stuttlega grein fyrir afstöðu sinni áður en hann víkur af fundi</li>
+  </ul>
+
+  <h3 class="section-h">Mætingaskylda</h3>
+  <ul class="points">
+    <li>Kjörnum fulltrúa er skylt að sækja fundi nema lögmæt forföll hamli</li>
+    <li>Við forföll skal boða staðgengil og láta formann vita með góðum fyrirvara</li>
+    <li>Fastar mánaðarlegar þóknanir falla niður ef fulltrúi sækir ekki fundi samfleytt þrisvar</li>
+  </ul>
+
+  <h3 class="section-h">Réttindi á fundum</h3>
+  <ul class="points">
+    <li>Hver fulltrúi á rétt á að koma máli á dagskrá fundar, ef hann skilar efninu til formanns a.m.k. þremur sólarhringum fyrir fund</li>
+    <li>Fundarmenn eru ekki bundnir af öðru en sannfæringu sinni, lögum og samþykktum í atkvæðagreiðslu</li>
+    <li>Fulltrúar skulu hafa hag sveitarfélagsins að leiðarljósi</li>
+  </ul>
+
+  <h3 class="section-h">Fundarboð og fundarsköp</h3>
+  <ul class="points">
+    <li>Fundir í nefndum og ráðum eru boðaðir með rafrænum hætti ásamt dagskrá a.m.k. <strong>tveimur sólarhringum</strong> fyrir fund</li>
+    <li>Fundargögn eru birt á lokaðri fundargátt sveitarfélagsins</li>
+    <li>Fundur telst ályktunarhæfur ef <strong>meirihluti</strong> er mættur</li>
+    <li>Í atkvæðagreiðslu ræður afl atkvæða – ef atkvæði falla að jöfnu telst mál fallið</li>
+    <li>Fundir nefnda og ráða eru að jafnaði haldnir fyrir luktum dyrum</li>
+  </ul>
+
+  <div class="alert-box">
+    <strong>Siðareglur kjörinna fulltrúa:</strong> Bæjarstjórn Vesturbyggðar hefur sett sérstaka siðareglugerð fyrir kjörna fulltrúa. Þú getur lesið hana í skjalinu „Siðareglur kjörinna fulltrúa í Vesturbyggð" í skjalalistanum.
+  </div>
+
+  <div class="note-box">
+    <strong>Heimildir:</strong> Samþykkt um stjórn Vesturbyggðar (nr. 410/2024) og erindisbréf einstakra nefnda og ráða
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="sieareglur_kjorinna_fulltrua_i_vesturbygge.pdf" target="_blank">📑 Siðareglur kjörinna fulltrúa í Vesturbyggð</a></span>
+    <span class="detail-src-item"><a href="samthykkt-um-strjorn-sameinads-sveitarfelagsins-talknafjarhrepps-og-vesturbyggdar.pdf" target="_blank">📑 Samþykkt um stjórn Vesturbyggðar (nr. 410/2024)</a></span>
+    <span class="detail-src-item"><a href="innri-personuverndarstefna-vesturbyggdar.pdf" target="_blank">📑 Innri persónuverndarstefna Vesturbyggðar</a></span>
+    <span class="detail-src-item"><a href="personuverndaryfirlysing-vesturbyggdar.pdf" target="_blank">📑 Persónuverndaryfirlýsing Vesturbyggðar</a></span>
+    <span class="detail-src-item"><a href="upplysingaoryggisstefna-vesturbyggd.pdf" target="_blank">📑 Upplýsingaöryggisstefna Vesturbyggðar</a></span>
+    </div>
+  </div>
+</div>`,
+
+radhus: `
+<div class="detail-header">
+  <span class="icon-big">📞</span>
+  <h2>Ráðhús Vesturbyggðar</h2>
+  <p>Ráðhús sveitarfélagsins hýsir yfirstjórn þess og sinnir afgreiðslu mála fyrir íbúa og fyrirtæki á svæðinu.</p>
+</div>
+<div class="detail-body">
+  <div class="contact-card">
+    <div>
+      <h3>Upplýsingar</h3>
+      <div class="contact-item">📍 Aðalstræti 75, 450 Patreksfjörður</div>
+      <div class="contact-item">📞 <a href="tel:+3544502300">+354 450 2300</a></div>
+      <div class="contact-item">✉️ <a href="mailto:vesturbyggd@vesturbyggd.is">vesturbyggd@vesturbyggd.is</a></div>
+    </div>
+    <div>
+      <h3>Opnunartímar</h3>
+      <div class="contact-item">Mánudag–Fimmtudag: 10:00–12:30 og 13:00–15:00</div>
+      <div class="contact-item">Föstudag: 10:00–12:00</div>
+      <div class="contact-item">Laugardag og sunnudag: Lokað</div>
+    </div>
+  </div>
+
+  <h3 class="section-h">Starfsemi í ráðhúsinu</h3>
+  <ul class="points">
+    <li>Almenn afgreiðsla</li>
+    <li>Bókhald</li>
+    <li>Byggingarfulltrúi</li>
+    <li>Bæjarstjóri</li>
+    <li>Félagsmálasvið</li>
+    <li>Íþrótta- og tómstundafulltrúi</li>
+    <li>Launavinnsla</li>
+    <li>Manntal og skjalavinnsla</li>
+    <li>Skrifstofa slökkviliðsstjóra</li>
+    <li>Útgáfa reikninga og innheimta</li>
+  </ul>
+
+  <h3 class="section-h">Vefsíða og fundargátt</h3>
+  <ul class="points">
+    <li>Fundargerðir nefnda og ráða eru birtar á heimasíðu sveitarfélagsins eftir hvern fund</li>
+    <li>Fundargögn eru birt á lokaðri fundargátt sveitarfélagsins fyrir kjörna fulltrúa og nefndarmenn</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Vefsíða Vesturbyggðar (vesturbyggd.is) og samþykktir sveitarfélagsins
+  </div>
+</div>`,
+
+
+sveitarstjornarlog: `
+<div class="detail-header">
+  <span class="icon-big">⚖️</span>
+  <h2>Sveitarstjórnarlög</h2>
+  <p>Sveitarstjórnarlög nr. 138/2011 eru grundvöllur starfs sveitarfélaga á Íslandi. Hér eru helstu ákvæði sem kjörnum fulltrúum er mikilvægt að þekkja.</p>
+</div>
+<div class="detail-body">
+
+  <h3 class="section-h">Gildissvið og skipan (1.–2. gr.)</h3>
+  <ul class="points">
+    <li>Lögin gilda um öll sveitarfélög á Íslandi og starfsemi þeirra</li>
+    <li>Sveitarfélög hafa sjálfræði í eigin málefnum innan þeirra marka sem lög setja</li>
+    <li>Sveitarstjórn fer með æðsta vald sveitarfélagsins nema lög mæli á annan veg</li>
+  </ul>
+
+  <h3 class="section-h">Fundir sveitarstjórnar</h3>
+  <ul class="points">
+    <li><strong>Opnir fundir:</strong> Fundir sveitarstjórnar eru að jafnaði opnir almenningi nema sveitarstjórn ákveði annað vegna eðlis máls</li>
+    <li><strong>Fundarboð:</strong> Fundarboð skal senda fulltrúum a.m.k. tveimur sólarhringum fyrir fund; á aukafund svo fljótt sem auðið er og a.m.k. einum sólarhring fyrirvara</li>
+    <li><strong>Dagskrá:</strong> Forseti setur saman dagskrá í samráði við bæjarstjóra. Sveitarstjórnarmaður getur krafist þess að mál verði tekið á dagskrá</li>
+    <li><strong>Lögmætur fundur:</strong> Fundur er lögmætur þegar meiri hluti sveitarstjórnarmanna situr hann</li>
+    <li><strong>Atkvæðagreiðsla:</strong> Ákvarðanir eru teknar með einfaldri meiri hluta atkvæða þeirra sem sitja fundinn og greiða atkvæði, nema lög kveði á um annað</li>
+    <li><strong>Fundargerð:</strong> Halda skal fundargerð um alla fundi sveitarstjórnar sem birt er á heimasíðu sveitarfélagsins</li>
+  </ul>
+
+  <h3 class="section-h">Réttindi kjörinna fulltrúa</h3>
+  <ul class="points">
+    <li><strong>Málfrelsi:</strong> Fulltrúar hafa málfrelsi, tillögurétt og atkvæðarétt á fundum sveitarstjórnar</li>
+    <li><strong>Óháð afstaða:</strong> Sveitarstjórnarmenn eru óháðir í starfi sínu og eingöngu bundnir af lögum og eigin sannfæringu í einstaka málum</li>
+    <li><strong>Fjarvistaréttur úr starfi:</strong> Sveitarstjórnarmaður á rétt á fjarveru úr launuðu starfi að því leyti sem nauðsynlegt er til að sinna lögbundinni mætingarskyldu</li>
+    <li><strong>Vernd starfstryggingar:</strong> Atvinnuveitanda er óheimilt að segja starfsmanni upp störfum vegna þess að hann boði sig fram eða verði kjörinn í sveitarstjórn</li>
+    <li><strong>Þóknun:</strong> Sveitarstjórn er skylt að ákveða kjörnum fulltrúum hæfilega þóknun og greiðslu ferða- og dvalarkostnaðar</li>
+  </ul>
+
+  <h3 class="section-h">Skyldur kjörinna fulltrúa</h3>
+  <ul class="points">
+    <li><strong>Mætingarskylda:</strong> Sveitarstjórnarmaður er skyldur til að sækja alla fundi sveitarstjórnar og þeirra nefnda og ráða sem hann situr, nema lögmæt forföll hamli</li>
+    <li><strong>Almennar skyldur:</strong> Sveitarstjórnarmaður skal rækt og samviskusamlega gegna þeim störfum sem sveitarstjórn felur honum og gæta hagsmuna sveitarfélagsins og íbúa þess</li>
+    <li><strong>Þagnarskylda:</strong> Sveitarstjórnarmenn hafa þagnarskyldu um atvik sem leynt eiga að fara vegna laga eða eðlis máls. Þagnarskyldan helst eftir að fulltrúi lætur af störfum</li>
+    <li><strong>Boða varamann:</strong> Við forföll ber sveitarstjórnarmanni að boða til fundar þann varamann sem á sæti samkvæmt lögum</li>
+  </ul>
+
+  <h3 class="section-h">Vanhæfi (hæfi til þátttöku í málum)</h3>
+  <ul class="points">
+    <li>Um hæfi sveitarstjórnarmanna og nefndarmanna til þátttöku í meðferð mála þar sem á eða til greina kemur að taka stjórnvaldsákvörðun gilda ákvæði <strong>stjórnsýslulaga</strong></li>
+    <li>Sveitarstjórnarmenn eru almennt <strong>ekki</strong> vanhæfir við val á fulltrúum í trúnaðarstörf eða við ákvörðun þóknunar fyrir slík störf</li>
+    <li>Sveitarstjórnarmaður sem jafnframt er starfsmaður og hefur sem slíkur tekið þátt í undirbúningi máls er <strong>alltaf vanhæfur</strong> þegar sama mál er til meðferðar í sveitarstjórn</li>
+    <li>Ef sveitarstjórnarmaður telur sig vanhæfan skal hann lýsa vanhæfi sínu og víkja af fundi meðan málið er til meðferðar</li>
+  </ul>
+
+  <h3 class="section-h">Nefndir og ráð</h3>
+  <ul class="points">
+    <li>Sveitarstjórn kýs fulltrúa í nefndir, ráð og stjórnir sem starfa á vegum sveitarfélagsins</li>
+    <li>Nefndir eru fastar (starfa á kjörtímabilinu) eða tímabundnar (skipaðar til sérstakra verkefna)</li>
+    <li>Nefndarmenn hafa sömu þagnarskyldu og réttindi og skyldur að mestu sem sveitarstjórnarmenn</li>
+    <li>Nefnd getur ekki tekið bindandi ákvarðanir umfram það valdsvið sem sveitarstjórn hefur falið henni</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Athugasemd:</strong> Þetta er yfirlit yfir helstu ákvæði laganna fyrir kjörna fulltrúa. Fyrir fullnægjandi lagaúrræðin skal vísa í lögin í heild sinni á Alþingi.
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+      <span class="detail-src-item"><a href="https://www.althingi.is/lagas/nuna/2011138.html" target="_blank">Sveitarstjórnarlög nr. 138/2011 – Alþingi</a></span>
+    </div>
+  </div>
+</div>`,
+
+stjornsyslulog: `
+<div class="detail-header">
+  <span class="icon-big">📋</span>
+  <h2>Stjórnsýslulög</h2>
+  <p>Stjórnsýslulög nr. 37/1993 gilda um meðferð mála hjá stjórnvöldum, þ.m.t. sveitarfélögum, þegar teknar eru ákvarðanir sem varða réttindi eða skyldur einstaklinga og lögaðila.</p>
+</div>
+<div class="detail-body">
+
+  <h3 class="section-h">Gildissvið (1. gr.)</h3>
+  <ul class="points">
+    <li>Lögin gilda um störf stjórnvalda, þar með talin sveitarfélög, þegar þau taka ákvarðanir um réttindi eða skyldur manna</li>
+    <li>Lögin gilda ekki um löggjafarvald né dómsvald, og gilda með takmörkunum um samninga sem stjórnvöld gera</li>
+    <li>Ákvæði laganna víkja fyrir sérákvæðum í öðrum lögum</li>
+  </ul>
+
+  <h3 class="section-h">Vanhæfi – sérstakt hæfi (3.–6. gr.)</h3>
+  <ul class="points">
+    <li><strong>Vanhæfisástæður (3. gr.):</strong> Starfsmaður eða nefndarmaður er vanhæfur til meðferðar máls ef hann er sjálfur aðili máls, ef hann er tengdur aðila nánum fjölskyldu- eða hjúskapartengslum, ef hann eða nákomnir hafa sérstakra fjárhagslegra hagsmuna að gæta, eða ef aðrar sérstakar ástæður eru til þess fallnar að draga óhlutdrægni hans í efa</li>
+    <li><strong>Réttarfylgjur vanhæfis (4. gr.):</strong> Vanhæfur starfsmaður má ekki taka þátt í undirbúningi, meðferð eða úrlausn máls</li>
+    <li><strong>Tilkynningarskylda (5. gr.):</strong> Starfsmaður sem verður var við vanhæfisástæðu skal þegar í stað vekja athygli yfirmanns á því; yfirmaðurinn ákveður hvort starfsmaðurinn víki sæti</li>
+    <li><strong>Skipun staðgengils (6. gr.):</strong> Ef enginn hæfur starfsmaður er til staðar getur æðra stjórnvald skipað annan aðila til að fara með málið</li>
+  </ul>
+
+  <h3 class="section-h">Rannsóknarreglan og leiðbeiningarskylda (7. og 9. gr.)</h3>
+  <ul class="points">
+    <li><strong>Rannsóknarreglan (7. gr.):</strong> Stjórnvald ber að sjá til þess að mál sé nægilega upplýst áður en ákvörðun er tekin</li>
+    <li><strong>Leiðbeiningarskylda (9. gr.):</strong> Stjórnvald skal veita þeim sem til þess leita nauðsynlegar leiðbeiningar um þau mál sem snerta starfssvið þess</li>
+  </ul>
+
+  <h3 class="section-h">Andmælaréttur (13. gr.)</h3>
+  <ul class="points">
+    <li>Áður en stjórnvald tekur ákvörðun sem er aðila máls í óhag ber almennt að gefa honum kost á að tjá sig um málsatvik</li>
+    <li>Andmælarétturinn á við þegar ákvörðun kann að vera aðila í óhag og hann hefur ekki þegar fengið tækifæri til að koma sjónarmiðum sínum á framfæri</li>
+    <li>Undantekningar: Andmælaréttur þarf ekki að vera veittur þegar um lögbundnar ákvarðanir er að ræða sem byggjast eingöngu á hlutlægum skilyrðum, eða þegar brýnar almannaástæður mæla gegn því</li>
+  </ul>
+
+  <h3 class="section-h">Tilkynning ákvörðunar og rökstuðningur (20.–22. gr.)</h3>
+  <ul class="points">
+    <li><strong>Tilkynning (20. gr.):</strong> Aðila máls skal tilkynnt um ákvörðun sem tekur til réttinda eða skyldna hans. Í tilkynningu skal vísað til kæruheimilda og kærufrests</li>
+    <li><strong>Réttur til rökstuðnings (21. gr.):</strong> Aðili máls getur krafist þess að stjórnvald gefi skriflegar ástæður fyrir ákvörðun sinni ef þær komu ekki fram við tilkynningu hennar</li>
+    <li><strong>Efni rökstuðnings (22. gr.):</strong> Í rökstuðningi skal vísa til þeirra réttarreglna sem ákvörðunin byggist á og gefa skýringu á þeim meginsjónarmiðum sem voru ráðandi við matskennda úrlausn</li>
+  </ul>
+
+  <h3 class="section-h">Kæruréttindi (26.–27. gr.)</h3>
+  <ul class="points">
+    <li><strong>Kæruréttur (26. gr.):</strong> Stjórnvaldsákvarðanir má kæra til æðra stjórnvalds nema lög mæli á annan veg. Kæra frestar almennt réttaráhrifum ákvörðunar</li>
+    <li><strong>Kærufrestur (27. gr.):</strong> Kærufrestur er þrír mánuðir frá því aðila var tilkynnt um ákvörðunina, nema lög kveði á um annan frest</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Athugasemd:</strong> Stjórnsýslulögin gilda um töku stjórnvaldsákvarðana – t.d. ákvarðanir um skipulag, framkvæmdaleyfi, félagsþjónustu o.fl. – en ekki um almenn stjórnunarleg vinnubrögð eða pólitískar ákvarðanir kjörinna fulltrúa. Fyrir fullnægjandi lagaúrræðin skal vísa í lögin á Alþingi.
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+      <span class="detail-src-item"><a href="https://www.althingi.is/lagas/nuna/1993037.html" target="_blank">Stjórnsýslulög nr. 37/1993 – Alþingi</a></span>
+    </div>
+  </div>
+</div>`,
+
+
+baejarstjori: `
+<div class="detail-header">
+  <span class="icon-big">👤</span>
+  <h2>Bæjarstjóri</h2>
+  <p>Bæjarstjóri er æðsti starfsmaður sveitarfélagsins og framkvæmdastjóri þess. Hann ber ábyrgð á daglegum rekstri og framkvæmd ákvarðana bæjarstjórnar og bæjarráðs.</p>
+</div>
+<div class="detail-body">
+  <div class="info-grid">
+    <div class="info-box"><div class="label">Staða</div><div class="value">Æðsti starfsmaður</div></div>
+    <div class="info-box"><div class="label">Skipun</div><div class="value">Bæjarráð skipar</div></div>
+    <div class="info-box"><div class="label">Tengsl</div><div class="value">Starfar undir bæjarráði</div></div>
+  </div>
+
+  <h3 class="section-h">Hlutverk og verkefni</h3>
+  <ul class="points">
+    <li>Fer með framkvæmdavald sveitarfélagsins og stýrir daglegum rekstri þess</li>
+    <li>Framkvæmir ákvarðanir bæjarstjórnar og bæjarráðs</li>
+    <li>Ber ábyrgð á fjármálum og reikningshaldi sveitarfélagsins</li>
+    <li>Stýrir starfsmönnum sveitarfélagsins og hefur yfirumsjón með þjónustu þess</li>
+    <li>Undirbýr fundi bæjarstjórnar og bæjarráðs í samráði við forseta</li>
+    <li>Gætir hagsmuna sveitarfélagsins gagnvart ríkisstofnunum og öðrum aðilum</li>
+    <li>Sér um samskipti við fjölmiðla og almenning af hálfu sveitarfélagsins</li>
+  </ul>
+
+  <h3 class="section-h">Samband við bæjarstjórn og bæjarráð</h3>
+  <ul class="points">
+    <li>Bæjarstjóri situr fundi bæjarstjórnar og bæjarráðs með málfrelsi og tillögurétt, en ekki atkvæðarétt</li>
+    <li>Bæjarráð skipar bæjarstjóra og ákveður kjör hans</li>
+    <li>Bæjarstjóri getur krafist þess að mál verði tekin til meðferðar hjá bæjarráði eða bæjarstjórn</li>
+    <li>Bæjarstjóri getur mótmælt ákvörðunum og látið mótmæli sín skráð í fundargerð</li>
+  </ul>
+
+  <h3 class="section-h">Ábyrgð og valdmörk</h3>
+  <ul class="points">
+    <li>Ber persónulega ábyrgð á framkvæmd laga og reglna sem gilda um sveitarfélagið</li>
+    <li>Getur tekið ákvarðanir í brýnum málum án samþykkis bæjarráðs, en skal þá þegar tilkynna bæjarráði um það</li>
+    <li>Kemur fram fyrir hönd sveitarfélagsins í samningum og samskiptum við þriðja aðila</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Samþykkt um stjórn Vesturbyggðar (nr. 410/2024), 2. og 3. kafli um framkvæmdavald.
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+      <span class="detail-src-item"><a href="samthykkt-um-strjorn-sameinads-sveitarfelagsins-talknafjarhrepps-og-vesturbyggdar.pdf" target="_blank">Samþykkt um stjórn Vesturbyggðar (nr. 410/2024)</a></span>
+    </div>
+  </div>
+</div>`,
+
+
+stofnanir: `
+<div class="detail-header">
+  <span class="icon-big">🏢</span>
+  <h2>Stofnanir sveitarfélagsins</h2>
+  <p>Vesturbyggð rekur fjölmargar stofnanir sem veita íbúum þjónustu á sviði menntunar, íþrótta, menningar, félagsþjónustu og samgangna.</p>
+</div>
+<div class="detail-body">
+  <h3 class="section-h">Fjölskyldusvið</h3>
+  <ul class="points">
+    <li><strong>Grunnskólar</strong> – grunnskólar í Patreksfirði, Bíldudal og Tálknafirði</li>
+    <li><strong>Leikskólar</strong> – leikskólar í Patreksfirði, Bíldudal og Tálknafirði</li>
+    <li><strong>Tónlistarskóli</strong> – tónlistarnám í sveitarfélaginu</li>
+    <li><strong>Íþróttamiðstöðvar</strong> – íþróttahús og sundlaugar á ýmsum stöðum</li>
+    <li><strong>Félagsmiðstöðvar</strong> – tómstundastarfsemi og félagslíf</li>
+    <li><strong>Bókasöfn</strong> – bókasöfn í þjónustu íbúa</li>
+    <li><strong>Félagsþjónusta</strong> – félagsleg þjónusta, barnavernd og fjárhagsaðstoð</li>
+  </ul>
+
+  <h3 class="section-h">Umhverfis- og framkvæmdasvið</h3>
+  <ul class="points">
+    <li><strong>Áhaldahús Patreksfjörður</strong> – viðhald og framkvæmdir á Patreksfirði</li>
+    <li><strong>Áhaldahús Bíldudalur</strong> – viðhald og framkvæmdir í Bíldudal</li>
+    <li><strong>Áhaldahús Tálknafjörður</strong> – viðhald og framkvæmdir í Tálknafirði</li>
+  </ul>
+
+  <h3 class="section-h">Hafnir</h3>
+  <ul class="points">
+    <li><strong>Patrekshöfn</strong> – höfn á Patreksfirði</li>
+    <li><strong>Bíldudalshöfn</strong> – höfn í Bíldudal</li>
+    <li><strong>Brjánslækjarhöfn</strong> – höfn í Brjánslæk</li>
+    <li><strong>Tálknafjarðarhöfn</strong> – höfn í Tálknafirði</li>
+  </ul>
+
+  <h3 class="section-h">Aðrir sérfræðingar og sérsvið</h3>
+  <ul class="points">
+    <li><strong>Byggingafulltrúi / Skipulagsfulltrúi</strong> – útgáfa leyfa, eftirlit og skipulagsmál</li>
+    <li><strong>Slökkkviliðsstjóri</strong> – brunavarnir og slökkvilið</li>
+  </ul>
+
+  <div class="note-box">
+    <strong>Heimild:</strong> Skipurit sveitarfélagsins. Nánari upplýsingar eru aðgengilegar á vefsíðu Vesturbyggðar.
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">📄 Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+    <span class="detail-src-item"><a href="https://www.vesturbyggd.is/stjornsysla/stofnanir/" target="_blank">🔗 Stofnanir sveitarfélagsins – vesturbyggd.is</a></span>
+    </div>
+  </div>
+</div>
+`,
+
+skipurit: `
+<div class="detail-header">
+  <span class="icon-big">📊</span>
+  <h2>Skipurit</h2>
+  <p>Skipurit Vesturbyggðar sýnir stigveldi stjórnkerfisins – frá kjörinni bæjarstjórn niður í starfssvið og stofnanir.</p>
+</div>
+<div class="detail-body">
+
+<style>
+.org-wrap { overflow-x: auto; padding: 8px 0 24px; }
+.org-tree { display: flex; flex-direction: column; align-items: center; gap: 0; font-size: 0.82rem; min-width: 640px; }
+.org-box {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-align: center;
+  white-space: nowrap;
+  position: relative;
+}
+.org-box.mid { background: var(--orange); color: #fff; }
+.org-box.dept { background: #2C3E5A; color: #fff; font-size: 0.82rem; font-weight: 600; }
+.org-box.solo { background: var(--gray-light); color: var(--navy); border: 1px solid var(--border); font-size: 0.8rem; }
+.org-connector { width: 2px; height: 20px; background: var(--border); margin: 0 auto; }
+.org-hline-wrap { display: flex; align-items: flex-start; justify-content: center; width: 100%; }
+.org-branch { display: flex; flex-direction: column; align-items: center; }
+.org-children {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+  width: 100%;
+}
+.org-children::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 80px);
+  height: 2px;
+  background: var(--border);
+}
+.org-branch > .org-connector { flex-shrink: 0; }
+.org-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  min-width: 140px;
+}
+.org-sub span {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.8);
+  padding: 1px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.org-sub span:last-child { border-bottom: none; }
+</style>
+
+<div class="org-wrap">
+<div class="org-tree">
+
+  <!-- Bæjarstjórn -->
+  <div class="org-box">Bæjarstjórn</div>
+  <div class="org-connector"></div>
+
+  <!-- Bæjarráð -->
+  <div class="org-box mid">Bæjarráð</div>
+  <div class="org-connector"></div>
+
+  <!-- Bæjarstjóri -->
+  <div class="org-box">Bæjarstjóri</div>
+  <div class="org-connector"></div>
+
+  <!-- 4 main departments + 2 solo roles -->
+  <div class="org-children">
+
+    <div class="org-branch">
+      <div class="org-connector"></div>
+      <div class="org-box dept">Fjármála- og stjórnsýslusvið</div>
+      <div class="org-sub">
+        <span>Bókhald</span>
+        <span>Innheimta</span>
+        <span>Launamál</span>
+        <span>Menningar- og ferðamál</span>
+        <span>Félagsheimili</span>
+        <span>Móttaka</span>
+        <span>Persónuvernd</span>
+        <span>Skjalastjórnun</span>
+      </div>
+    </div>
+
+    <div class="org-branch">
+      <div class="org-connector"></div>
+      <div class="org-box dept">Fjölskyldusvið</div>
+      <div class="org-sub">
+        <span>Félagsþjónusta</span>
+        <span>Skólar og leikskólar</span>
+        <span>Íþrótta- og tómstundamál</span>
+        <span>Íþróttamiðstöðvar</span>
+        <span>Félagsmiðstöðvar</span>
+        <span>Bókasöfn</span>
+      </div>
+    </div>
+
+    <div class="org-branch">
+      <div class="org-connector"></div>
+      <div class="org-box dept">Umhverfis- og framkvæmdasvið</div>
+      <div class="org-sub">
+        <span>Áhaldahús Patreksfjörður</span>
+        <span>Áhaldahús Bíldudalur</span>
+        <span>Áhaldahús Tálknafjörður</span>
+      </div>
+    </div>
+
+    <div class="org-branch">
+      <div class="org-connector"></div>
+      <div class="org-box dept">Hafnarstjóri</div>
+      <div class="org-sub">
+        <span>Patrekshöfn</span>
+        <span>Bíldudalshöfn</span>
+        <span>Brjánslækjarhöfn</span>
+        <span>Tálknafjarðarhöfn</span>
+      </div>
+    </div>
+
+    <div class="org-branch">
+      <div class="org-connector"></div>
+      <div class="org-box solo">Byggingafulltrúi / Skipulagsfulltrúi</div>
+    </div>
+
+    <div class="org-branch">
+      <div class="org-connector"></div>
+      <div class="org-box solo">Slökkkviliðsstjóri</div>
+    </div>
+
+  </div><!-- /org-children -->
+
+</div><!-- /org-tree -->
+</div><!-- /org-wrap -->
+
+  <div class="note-box" style="margin-top:24px">
+    <strong>Heimild:</strong> Skipurit sveitarfélagsins af vefsíðu Vesturbyggðar (Stjórnsýsla → Skipurit)
+  </div>
+  <div class="detail-source">
+    <div class="detail-source-label">Frumheimildir þessarar síðu</div>
+    <div class="detail-source-links">
+      <span class="detail-src-item"><span class="detail-src-item"><a href="https://www.vesturbyggd.is/stjornsysla/skipurit/" target="_blank">Skipurit – vesturbyggd.is</a></span></span>
+    </div>
+  </div>
+</div>`,
+};
+
+// ── NAVIGATION ───────────────────────────────────────────────
+const overview = document.getElementById('overview');
+const detail   = document.getElementById('detail');
+const srDiv    = document.getElementById('search-results');
+const srList   = document.getElementById('sr-list');
+const srLabel  = document.getElementById('sr-label');
+const noRes    = document.getElementById('no-results');
+const backBtn  = document.getElementById('back-btn');
+const searchEl = document.getElementById('search');
+
+function showOverview() {
+  overview.style.display = '';
+  detail.style.display = 'none';
+  srDiv.style.display = 'none';
+  backBtn.style.display = 'none';
+  searchEl.value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showDetail(id) {
+  const html = DETAILS[id];
+  if (!html) return;
+  detail.innerHTML = `
+    <div class="breadcrumb">
+      <a onclick="showOverview()">← Yfirlit</a>
+    </div>
+    <div class="detail-card">${html}</div>
+  `;
+  overview.style.display = 'none';
+  srDiv.style.display = 'none';
+  detail.style.display = 'block';
+  backBtn.style.display = 'flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── SEARCH ────────────────────────────────────────────────────
+searchEl.addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  if (!q) { showOverview(); return; }
+
+  overview.style.display = 'none';
+  detail.style.display = 'none';
+  srDiv.style.display = 'block';
+  backBtn.style.display = 'flex';
+
+  const matches = DATA.filter(d =>
+    d.title.toLowerCase().includes(q) ||
+    d.keywords.toLowerCase().includes(q) ||
+    d.summary.toLowerCase().includes(q)
+  );
+
+  srLabel.textContent = matches.length
+    ? `${matches.length} niðurstaða${matches.length === 1 ? '' : 'r'} fyrir „${this.value.trim()}"`
+    : '';
+
+  if (!matches.length) {
+    srList.innerHTML = '';
+    noRes.classList.remove('hidden');
+    return;
+  }
+  noRes.classList.add('hidden');
+
+  srList.innerHTML = matches.map(m => {
+    const hi = (t) => t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>');
+    return `<div class="sr-item" onclick="showDetail('${m.id}')">
+      <h4>${hi(m.title)}</h4>
+      <p>${hi(m.summary)}</p>
+    </div>`;
+  }).join('');
+});
+
+// Close search on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && searchEl.value) showOverview();
+});
+</script>
+</body>
+</html>
